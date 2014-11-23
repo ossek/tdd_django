@@ -7,6 +7,9 @@ class HomePageTest(TestCase):
 
 	def test_root_url_resolves_to_home_page_view(self):
 		found = resolve('/')
+		print(found)
+		print(found.func)
+		# simply assert that the function we resolved to == home_page from views.py/lists.views
 		self.assertEqual(found.func, home_page)
 
 	def test_home_page_returns_correct_html(self):
