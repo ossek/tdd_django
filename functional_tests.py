@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 import unittest
 
 class NewVisitorTest(unittest.TestCase):
@@ -32,13 +33,13 @@ class NewVisitorTest(unittest.TestCase):
 
         #when she hits enter the page updates and now the page lists 'buy peacock feathers' in
         #a todo list
-        inputbox.send_keys(keys.ENTER)
+        inputbox.send_keys(Keys.ENTER)
 
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_element_by_tag_name('tr')
         self.assertTrue(
                 any(row.text == '1: Buy peacock feathers' for row in rows)
-                )
+        )
 
         #still a text box inviting another todo add (she adds ' make a fly' )
         self.fail('finish the test')
