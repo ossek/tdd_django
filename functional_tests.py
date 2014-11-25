@@ -12,7 +12,7 @@ class NewVisitorTest(unittest.TestCase):
         self.browser.quit()
 
     def test_can_start_a_list_and_retrieve_it_later(self):
-        #E goes to a todo app's homepage    
+        #E goes to a todo app's homepage
         self.browser.get('http://localhost:8000');
 
         #She notices the page title and header mention todo lists
@@ -26,11 +26,11 @@ class NewVisitorTest(unittest.TestCase):
                 inputbox.get_attribute('placeholder'),
                 'Enter a to-do item'
                 )
-        
+
         #E types 'Buy peacock feathers' into a textbox
         inputbox.send_keys('Buy peacock feathers')
-        
-        #when she hits enter the page updates and now the page lists 'buy peacock feathers' in 
+
+        #when she hits enter the page updates and now the page lists 'buy peacock feathers' in
         #a todo list
         inputbox.send_keys(keys.ENTER)
 
@@ -39,15 +39,15 @@ class NewVisitorTest(unittest.TestCase):
         self.assertTrue(
                 any(row.text == '1: Buy peacock feathers' for row in rows)
                 )
-        
+
         #still a text box inviting another todo add (she adds ' make a fly' )
         self.fail('finish the test')
-        
+
         #page updates again and shows both items
-        
+
         #E sees that the site has made a unique url for her list and some explanatory text
         #to that effect
-        
+
         #she vists the url and the list is still there
 
 if __name__ == '__main__':
