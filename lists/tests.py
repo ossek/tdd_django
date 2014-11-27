@@ -8,32 +8,63 @@ from lists.models import Item
 class HomePageTest(TestCase):
 
  # seems there is a convention that a test method must be started with 'test_'
- def test_root_url_resolves_to_home_page_view(self):
-    found = resolve('/')
-    print(found)
-    print(found.func)
-    # simply assert that the function we resolved to == home_page from views.py/lists.views
-    self.assertEqual(found.func, home_page)
+    def test_root_url_resolves_to_home_page_view(self):
+         found = resolve('/')
+         print(found)
+         print(found.func)
+         # simply assert that the function we resolved to == home_page from views.py/lists.views
+         self.assertEqual(found.func, home_page)
+   
+    def test_home_page_returns_correct_html(self):
+         request = HttpRequest()
+         response = home_page(request)
+         expected_html = render_to_string('home.html')
+         self.assertEqual(response.content.decode(),expected_html)
+   
+    def test_home_page_can_save_a_post_request(self):
+         new_item_text = 'A new list item'
+   
+         request = HttpRequest()
+         request.method = 'POST'
+         request.POST['item_text'] = new_item_text
+   
+         response = home_page(request)
+   
+         self.assertEqual(Item.objects.count(),1)
+         new_item = Item.objects.first()
+         self.assertEqual(new_item.text, new_item_text)
+   
 
- def test_home_page_returns_correct_html(self):
-    request = HttpRequest()
-    response = home_page(request)
-    expected_html = render_to_string('home.html')
-    self.assertEqual(response.content.decode(),expected_html)
+    def test_home_page_redirects_after_post(self):
+        new_item_text = 'A new list item'
 
- def test_can_save_a_post_request(self):
-     request = HttpRequest()
-     request.method = 'POST'
-     request.POST['item_text'] = 'A new list item'
+        request = HttpRequest()
+        request.method = 'POST'
+        request.POST['item_text'] = new_item_text
 
-     response = home_page(request)
+        response = home_page(request)
 
-     self.assertIn('A new list item', response.content.decode())
-     expected_html = render_to_string(
-             'home.html',
-             {'new_item_text': 'A new list item'}
-             )
-     self.assertEqual(response.content.decode(),expected_html)
+        self.assertEqual(response.status_code,302)
+        self.assertEqual(response['location'],'/')
+
+        
+    def test_home_page_only_saves_items_when_necessary(self):
+        request = HttpRequest()
+        response = home_page(request)
+        self.assertEqual(Item.objects.count(),0)
+
+    def test_home_page_displays_all_list_items(self):
+        new_item_text1 = 'first item'
+        new_item_text2 = 'second item'
+
+        Item.objects.create(text = new_item_text1)
+        Item.objects.create(text = new_item_text2)
+
+        request = HttpRequest()
+        response = home_page(request)
+
+        self.assertIn(new_item_text1,response.content.decode())
+        self.assertIn(new_item_text2,response.content.decode())
 
 
 class ItemModelTest(TestCase):
@@ -56,5 +87,3 @@ class ItemModelTest(TestCase):
         second_saved_item = saved_items[1]
         self.assertEqual(first_saved_item.text,first_item_text)
         self.assertEqual(second_saved_item.text,second_item_text)
-
-
