@@ -5,6 +5,28 @@ from lists.views import home_page
 from django.template.loader import render_to_string
 from lists.models import Item
 
+class ListViewTest(TestCase):
+
+    def test_displays_all_list_items(self):
+        new_item_text1 = 'first item'
+        new_item_text2 = 'second item'
+
+        Item.objects.create(text = new_item_text1)
+        Item.objects.create(text = new_item_text2)
+
+        response = self.client.get('/lists/the-only-list-in-the-world')
+        ## alternatively: 
+        # request = HttpRequest()
+        # response = home_page(request)
+
+        self.assertContains(response,new_item_text1)
+        self.assertContains(response,new_item_text2)
+
+    def test_uses_different_template(self):
+        response = self.client.get('/lists/the-only-list-in-the-world')
+        self.assertTemplateUsed(response,'list.html')
+
+
 class HomePageTest(TestCase):
 
  # seems there is a convention that a test method must be started with 'test_'
@@ -45,7 +67,7 @@ class HomePageTest(TestCase):
         response = home_page(request)
 
         self.assertEqual(response.status_code,302)
-        self.assertEqual(response['location'],'/')
+        self.assertEqual(response['location'],'/lists/the-only-list-in-the-world')
 
         
     def test_home_page_only_saves_items_when_necessary(self):
@@ -53,20 +75,7 @@ class HomePageTest(TestCase):
         response = home_page(request)
         self.assertEqual(Item.objects.count(),0)
 
-    def test_home_page_displays_all_list_items(self):
-        new_item_text1 = 'first item'
-        new_item_text2 = 'second item'
-
-        Item.objects.create(text = new_item_text1)
-        Item.objects.create(text = new_item_text2)
-
-        request = HttpRequest()
-        response = home_page(request)
-
-        self.assertIn(new_item_text1,response.content.decode())
-        self.assertIn(new_item_text2,response.content.decode())
-
-
+    
 class ItemModelTest(TestCase):
     
     def test_saving_and_retrieving_items(self):
