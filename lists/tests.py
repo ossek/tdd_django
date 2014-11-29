@@ -3,7 +3,7 @@ from django.core.urlresolvers import resolve
 from django.http import HttpRequest
 from lists.views import home_page
 from django.template.loader import render_to_string
-from lists.models import Item
+from lists.models import Item, List
 
 class ListViewTest(TestCase):
 
@@ -11,8 +11,9 @@ class ListViewTest(TestCase):
         new_item_text1 = 'first item'
         new_item_text2 = 'second item'
 
-        Item.objects.create(text = new_item_text1)
-        Item.objects.create(text = new_item_text2)
+        list_ = List.objects.create()
+        Item.objects.create(text = new_item_text1,owningList = list_)
+        Item.objects.create(text = new_item_text2,owningList = list_)
 
         response = self.client.get('/lists/the-only-list-in-the-world/')
         ## alternatively: 
@@ -68,18 +69,26 @@ class HomePageTest(TestCase):
         self.assertEqual(response.content.decode(),expected_html)
 
     
-class ItemModelTest(TestCase):
+class ListAndItemModelTest(TestCase):
     
     def test_saving_and_retrieving_items(self):
+        list_ = List()
+        list_.save()
+        
         first_item_text = 'The first (ever) list item'
         first_item = Item()
+        first_item.owningList = list_
         first_item.text = first_item_text
         first_item.save()
 
         second_item_text = 'Item the second'
         second_item = Item()
+        second_item.owningList = list_
         second_item.text = second_item_text
         second_item.save()
+
+        saved_list = List.objects.first()
+        self.assertEqual(saved_list,list_)
 
         saved_items = Item.objects.all()
         self.assertEqual(saved_items.count(),2)
@@ -87,4 +96,6 @@ class ItemModelTest(TestCase):
         first_saved_item = saved_items[0]
         second_saved_item = saved_items[1]
         self.assertEqual(first_saved_item.text,first_item_text)
+        self.assertEqual(first_saved_item.owningList,list_)
         self.assertEqual(second_saved_item.text,second_item_text)
+        self.assertEqual(second_saved_item.owningList,list_)
