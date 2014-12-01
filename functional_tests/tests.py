@@ -33,22 +33,18 @@ class NewVisitorTest(LiveServerTestCase):
     def test_can_start_a_list_and_retrieve_it_later(self):
         #E goes to a todo app's homepage
         self.browser.get(self.live_server_url)
-
         #She notices the page title and header mention todo lists
         self.assertIn('To-Do',self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
         self.assertIn('To-Do',header_text)
-
         #She is invited to enter a todo item right away
         inputbox = self.browser.find_element_by_id('id_new_item')
         self.assertEqual(
                 inputbox.get_attribute('placeholder'),
                 'Enter a to-do item'
                 )
-
         #E types 'Buy peacock feathers' into a textbox
         inputbox.send_keys('Buy peacock feathers')
-
         #when she hits enter the page updates and now the page lists 'buy peacock feathers' in
         #a todo list
         inputbox.send_keys(Keys.ENTER)
@@ -56,7 +52,6 @@ class NewVisitorTest(LiveServerTestCase):
         edith_list_url = self.browser.current_url;
         self.assertRegex(edith_list_url,'/lists/.+');
         self.check_for_row_in_list_table('1: Buy peacock feathers')
-
         #still a text box inviting another todo add (she adds ' build a hat' )
         todo_item_2 = 'use feathers to build hat'
         # NAB -- apparently have to reget the input box
@@ -85,8 +80,6 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertRegex(francis_list_url,'/lists/.+')
         self.assertNotEqual(francis_list_url,edith_list_url)
         # no trace of edith's list
-        page_text = self.browser.find_element_by_tag_name('body')
+        page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Buy peacock feathers',page_text)
         self.assertIn('Eat radishes',page_text)
-
-        self.fail('finish the test')
